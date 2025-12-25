@@ -13,6 +13,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Print tag (debug)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Tauri CLI
         run: |
-          echo "Tag triggered: ${{ github.ref_name }}"
+          npm install -g @tauri-apps/cli
+
+      - name: Verify tools
+        run: |
+          node -v
+          rustc -V
+          npx tauri -V
