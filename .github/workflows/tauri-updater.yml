@@ -33,6 +33,18 @@ jobs:
         run: |
           npx tauri build
 
-      - name: List MSI output (debug)
+      - name: Sign MSI
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: |
+          $msi = Get-ChildItem "src-tauri/target/release/bundle/msi/*.msi" | Select-Object -First 1
+          echo "Signing $($msi.FullName)"
+          npx tauri signer sign `
+            --private-key "$env:TAURI_SIGNING_PRIVATE_KEY" `
+            --password "$env:TAURI_SIGNING_PRIVATE_KEY_PASSWORD" `
+            "$($msi.FullName)"
+
+      - name: Verify signature file
         run: |
           ls src-tauri/target/release/bundle/msi
