@@ -21,12 +21,18 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Install Tauri CLI
+      - name: Install frontend dependencies
         run: |
-          npm install -g @tauri-apps/cli
+          npm install
 
-      - name: Verify tools
+      - name: Build frontend (Vite)
         run: |
-          node -v
-          rustc -V
-          npx tauri -V
+          npm run build
+
+      - name: Build Tauri MSI
+        run: |
+          npx tauri build
+
+      - name: List MSI output (debug)
+        run: |
+          ls src-tauri/target/release/bundle/msi
