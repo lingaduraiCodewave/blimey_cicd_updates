@@ -77,6 +77,43 @@ jobs:
           Write-Host "Generated latest.json:"
           Get-Content latest.json
 
+      - name: Install Azure CLI
+        run: |
+          choco install azure-cli -y
+
+      - name: Upload artifacts to Azure Blob
+        env:
+          AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT }}
+          AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
+          AZURE_CONTAINER_NAME: ${{ secrets.AZURE_CONTAINER_NAME }}
+        run: |
+          $msi = Get-ChildItem "src-tauri/target/release/bundle/msi/*.msi" | Select-Object -First 1
+          $sig = Get-ChildItem "src-tauri/target/release/bundle/msi/*.sig" | Select-Object -First 1
+
+          az storage blob upload `
+            --account-name $env:AZURE_STORAGE_ACCOUNT `
+            --account-key $env:AZURE_STORAGE_KEY `
+            --container-name $env:AZURE_CONTAINER_NAME `
+            --file $msi.FullName `
+            --name $msi.Name `
+            --overwrite true
+
+          az storage blob upload `
+            --account-name $env:AZURE_STORAGE_ACCOUNT `
+            --account-key $env:AZURE_STORAGE_KEY `
+            --container-name $env:AZURE_CONTAINER_NAME `
+            --file $sig.FullName `
+            --name $sig.Name `
+            --overwrite true
+
+          az storage blob upload `
+            --account-name $env:AZURE_STORAGE_ACCOUNT `
+            --account-key $env:AZURE_STORAGE_KEY `
+            --container-name $env:AZURE_CONTAINER_NAME `
+            --file latest.json `
+            --name latest.json `
+            --overwrite true
+
       - name: Verify signature file
         run: |
           ls src-tauri/target/release/bundle/msi
