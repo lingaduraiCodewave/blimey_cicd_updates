@@ -14,4 +14,5 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Print tag (debug)
-        run: echo Tag triggered: ${{ github.ref_name }}
+        run: |
+          echo "Tag triggered: ${{ github.ref_name }}"
