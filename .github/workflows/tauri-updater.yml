@@ -44,6 +44,38 @@ jobs:
             --private-key "$env:TAURI_SIGNING_PRIVATE_KEY" `
             --password "$env:TAURI_SIGNING_PRIVATE_KEY_PASSWORD" `
             "$($msi.FullName)"
+      - name: Generate latest.json
+        env:
+          AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT }}
+          AZURE_CONTAINER_NAME: ${{ secrets.AZURE_CONTAINER_NAME }}
+        run: |
+          $msi = Get-ChildItem "src-tauri/target/release/bundle/msi/*.msi" | Select-Object -First 1
+          $sig = Get-ChildItem "src-tauri/target/release/bundle/msi/*.sig" | Select-Object -First 1
+
+          $version = "${{ github.ref_name }}".TrimStart("v")
+          $pubDate = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+
+          $signature = (Get-Content $sig.FullName -Raw).Trim()
+          $fileName = $msi.Name
+
+          $url = "https://$env:AZURE_STORAGE_ACCOUNT.blob.core.windows.net/$env:AZURE_CONTAINER_NAME/$fileName"
+
+          $json = @{
+            version = $version
+            notes = "Bug fixes and improvements"
+            pub_date = $pubDate
+            platforms = @{
+              "windows-x86_64" = @{
+                url = $url
+                signature = $signature
+              }
+            }
+          } | ConvertTo-Json -Depth 10
+
+          $json | Out-File latest.json -Encoding utf8
+
+          Write-Host "Generated latest.json:"
+          Get-Content latest.json
 
       - name: Verify signature file
         run: |
