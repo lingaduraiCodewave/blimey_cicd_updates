@@ -77,9 +77,9 @@ jobs:
           Write-Host "Generated latest.json:"
           Get-Content latest.json
 
-      - name: Install Azure CLI
+      - name: Verify Azure CLI
         run: |
-          choco install azure-cli -y
+          az --version
 
       - name: Upload artifacts to Azure Blob
         env:
