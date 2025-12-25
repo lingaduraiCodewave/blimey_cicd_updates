@@ -52,7 +52,7 @@ jobs:
           $msi = Get-ChildItem "src-tauri/target/release/bundle/msi/*.msi" | Select-Object -First 1
           $sig = Get-ChildItem "src-tauri/target/release/bundle/msi/*.sig" | Select-Object -First 1
 
-          $version = "${{ github.ref_name }}".TrimStart("v")
+          $version = (Get-Content "src-tauri/tauri.conf.json" | ConvertFrom-Json).version
           $pubDate = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
 
           $signature = (Get-Content $sig.FullName -Raw).Trim()
