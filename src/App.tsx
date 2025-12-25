@@ -28,7 +28,8 @@ function App() {
       {/* Your existing app content */}
       <h1>hello Lingadurai</h1>
 
-      <h2>Update 0.1.2</h2>
+      <h2>Update 0.1.3</h2>
+      <h3>update done by github action </h3>
 
       {updateInfo && <h1>{updateInfo.toString()}</h1>}
       {updateAvailable && (
